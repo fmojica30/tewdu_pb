@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/labstack/echo/v5"
@@ -10,14 +9,18 @@ import (
 	"github.com/pocketbase/pocketbase/core"
 )
 
-func progressCalculation(app core.App, c echo.Context, datString string) float64 {
+type dataDTO struct {
+	Completion float64
+}
+
+func progressCalculation(app core.App, c echo.Context, datString string) (float64, error) {
 	var complete float64
 	var total float64
 
 	app.DB().
 		Select("count(*)").
 		From("goals").
-		Row(&total)
+		Row(&complete)
 
 	app.DB().
 		Select("count(*)").
@@ -25,7 +28,7 @@ func progressCalculation(app core.App, c echo.Context, datString string) float64
 		Where(dbx.NewExp("goal_completion=1")).
 		Row(&complete)
 
-	return complete / total
+	return (complete / total), nil
 }
 
 func DailyProgress(app core.App) {
@@ -34,9 +37,18 @@ func DailyProgress(app core.App) {
 			Method: http.MethodGet,
 			Path:   "/progress/day/:date-string",
 			Handler: func(c echo.Context) error {
-				w := progressCalculation(app, c, "test")
-				s1 := fmt.Sprintf("%v", w)
-				return c.String(200, s1)
+				w, err := progressCalculation(app, c, "test")
+
+				data := dataDTO{
+					Completion: w,
+				}
+
+				if err != nil {
+					return c.JSON(http.StatusExpectationFailed, w)
+				}
+				//s1 := fmt.Sprintf("%v", w)
+				//return c.String(200, s1)
+				return c.JSON(http.StatusOK, data)
 			},
 			Middlewares: []echo.MiddlewareFunc{
 				apis.ActivityLogger(app),
