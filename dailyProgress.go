@@ -28,7 +28,7 @@ func progressCalculation(app core.App, c echo.Context, datString string) (float6
 		Where(dbx.NewExp("goal_completion=1")).
 		Row(&complete)
 
-	return (complete / total), nil
+	return complete / total, nil
 }
 
 func DailyProgress(app core.App) {

@@ -1,9 +1,8 @@
 package main
 
 import (
-	"log"
-
 	"github.com/pocketbase/pocketbase"
+	"log"
 )
 
 func main() {
@@ -11,6 +10,8 @@ func main() {
 
 	DateStringProcess(app)
 	DailyProgress(app)
+	GetDailyGoals(app)
+	TestEndpoint(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
