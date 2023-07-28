@@ -50,12 +50,18 @@ func TestEndpoint(app core.App) {
 			user, _ := c.Get(apis.ContextAuthRecordKey).(*models.Record)
 
 			currentCampaign := GetCampaign(app, user.GetId())
-
 			fmt.Print(currentCampaign[0].Get("name"))
 
 			currentHabits := GetCurrentHabits(app, currentCampaign[0].GetId())
+			var currentHabitIds []interface{}
 
-			fmt.Print(currentHabits[0])
+			for _, element := range currentHabits {
+				currentHabitIds = append(currentHabitIds, element.GetId())
+			}
+			fmt.Print(currentHabitIds)
+
+			currentHabitCompletion := GetDailyHabitCompletion(app, currentHabitIds)
+			fmt.Print(currentHabitCompletion)
 
 			return nil
 		})
