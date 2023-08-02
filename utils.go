@@ -26,35 +26,32 @@ func GetTodayEnd() time.Time {
 // GetCampaign
 // Returns the current campaign
 func GetCampaign(app core.App, user string) []*models.Record {
-
 	records, err := app.Dao().FindRecordsByExpr("campaign", dbx.And(
 		dbx.HashExp{"active": true, "user": user},
 	))
-
 	if err != nil {
 		return nil
 	}
-
 	return records
 }
 
 // GetCurrentHabits Get a list of the habits in the current campaign
 func GetCurrentHabits(app core.App, campaignID string) []*models.Record {
-
 	records, err := app.Dao().FindRecordsByExpr("habit_details", dbx.HashExp{"campaign": campaignID})
-
 	if err != nil {
 		return nil
 	}
-
 	return records
 }
 
+// GetDailyHabitCompletion Gets daily habit detail information
 func GetDailyHabitCompletion(app core.App, currentHabits []interface{}) []*models.Record {
-	records, err := app.Dao().FindRecordsByExpr("habit_completion", dbx.And(
-		dbx.In("habit", currentHabits...),
-		dbx.Between("date", GetJuly272023Beginning(), GetJuly272023End()),
-	))
+	records, err := app.Dao().FindRecordsByExpr("habit_completion",
+		dbx.And(
+			dbx.In("habit", currentHabits...),
+			dbx.Between("date", GetJuly272023Beginning(), GetJuly272023End()),
+		),
+	)
 
 	if err != nil {
 		return nil

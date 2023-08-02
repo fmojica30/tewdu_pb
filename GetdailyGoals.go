@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"github.com/labstack/echo/v5"
-	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/apis"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/models"
@@ -20,22 +19,21 @@ func GetDailyGoals(app core.App) {
 				return c.JSON(http.StatusForbidden, "Only Authenticated users can access this endpoint")
 			}
 
-			//queryString := "SELECT goal_name FROM goals WHERE user_id = " + user.GetId()
-			//queryString := "SELECT goal_name FROM goals"
+			currentCampaign := GetCampaign(app, user.GetId())
 
-			err := app.DB().
-				Select("*").
-				From("habit_completion").
-				Where(dbx.HashExp{"user": user.GetId()}).
-				AndWhere(dbx.Between("date", GetTodayBeginning(), GetTodayEnd()))
+			currentHabits := GetCurrentHabits(app, currentCampaign[0].GetId())
 
-			if err != nil {
-				fmt.Printf("Error on query")
+			var currentHabitIds []interface{}
+
+			for _, element := range currentHabits {
+				currentHabitIds = append(currentHabitIds, element.GetId())
 			}
+
+			currentHabitCompletion := GetDailyHabitCompletion(app, currentHabitIds)
 
 			return c.JSON(
 				http.StatusOK,
-				"test",
+				currentHabitCompletion,
 			)
 		})
 
