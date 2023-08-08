@@ -2,6 +2,7 @@ package Collections
 
 import (
 	"errors"
+	"example/user/hello/Utils"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
 	"github.com/pocketbase/pocketbase/models"
@@ -9,7 +10,7 @@ import (
 
 // GetCurrentHabits Get a list of the habits in the current campaign
 func GetCurrentHabits(app core.App, campaignID string) ([]*models.Record, error) {
-	records, err := app.Dao().FindRecordsByExpr("habit_details", dbx.HashExp{"campaign": campaignID})
+	records, err := app.Dao().FindRecordsByExpr("habit", dbx.HashExp{"campaign": campaignID})
 
 	if err != nil {
 		return nil, err
@@ -17,12 +18,12 @@ func GetCurrentHabits(app core.App, campaignID string) ([]*models.Record, error)
 	return records, nil
 }
 
-// GetDailyHabitCompletion Gets daily habit detail information
-func GetDailyHabitCompletion(app core.App, currentHabits []interface{}) ([]*models.Record, error) {
+// GetDailyHabitDetails Gets daily habit detail information
+func GetDailyHabitDetails(app core.App, currentHabits []interface{}) ([]*models.Record, error) {
 	records, err := app.Dao().FindRecordsByExpr("habit_completion",
 		dbx.And(
 			dbx.In("habit", currentHabits...),
-			dbx.Between("date", GetJuly272023Beginning(), GetJuly272023End()),
+			dbx.Between("date", Utils.GetJuly272023Beginning(), Utils.GetJuly272023End()),
 		),
 	)
 
@@ -33,7 +34,7 @@ func GetDailyHabitCompletion(app core.App, currentHabits []interface{}) ([]*mode
 	return records, nil
 }
 
-func ToggleHabitCompletion(app core.App, habitID string, userID string) error {
+func ToggleHabitCompletion(app core.App, habitID string) error {
 	record, err := app.Dao().FindRecordById("habit_completion", habitID)
 
 	if err != nil {
@@ -47,10 +48,8 @@ func ToggleHabitCompletion(app core.App, habitID string, userID string) error {
 	} else if completionFlag == false {
 		record.Set("completion", true)
 	} else {
-		return errors.New("Message: error in Toggle Habit Completion")
+		return errors.New("message: error in toggle habit completion")
 	}
-
-	//Add in level calculation here
 
 	return nil
 }
