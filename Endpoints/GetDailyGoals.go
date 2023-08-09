@@ -11,43 +11,43 @@ import (
 
 func GetDailyHabits(app core.App) {
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
-		e.Router.GET("/base/dailygoals/", func(c echo.Context) error {
-			//Get auth user
-			user, _ := c.Get(apis.ContextAuthRecordKey).(*models.Record)
+		e.Router.GET(
+			"/base/dailygoals/",
+			func(c echo.Context) error {
+				//Get auth user
+				user, _ := c.Get(apis.ContextAuthRecordKey).(*models.Record)
+				if user == nil {
+					return c.JSON(http.StatusForbidden, "Only Authenticated users can access this endpoint")
+				}
 
-			if user == nil {
-				return c.JSON(http.StatusForbidden, "Only Authenticated users can access this endpoint")
-			}
+				currentCampaign, err := Collections.GetActiveCampaign(app, user.GetId())
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, err.Error())
+				}
 
-			currentCampaign, err := Collections.GetActiveCampaign(app, user.GetId())
+				currentHabits, err := Collections.GetCurrentHabits(app, currentCampaign.GetId())
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, err.Error())
+				}
 
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, err.Error())
-			}
+				var currentHabitIds []interface{}
 
-			currentHabits, err := Collections.GetCurrentHabits(app, currentCampaign.GetId())
+				for _, element := range currentHabits {
+					currentHabitIds = append(currentHabitIds, element.GetId())
+				}
 
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, err.Error())
-			}
+				currentHabitCompletion, err := Collections.GetDailyHabitDetails(app, currentHabitIds)
 
-			var currentHabitIds []interface{}
+				if err != nil {
+					return c.JSON(http.StatusInternalServerError, err.Error())
+				}
 
-			for _, element := range currentHabits {
-				currentHabitIds = append(currentHabitIds, element.GetId())
-			}
-
-			currentHabitCompletion, err := Collections.GetDailyHabitDetails(app, currentHabitIds)
-
-			if err != nil {
-				return c.JSON(http.StatusInternalServerError, err.Error())
-			}
-
-			return c.JSON(
-				http.StatusOK,
-				currentHabitCompletion,
-			)
-		})
+				return c.JSON(
+					http.StatusOK,
+					currentHabitCompletion,
+				)
+			},
+		)
 
 		return nil
 	})
