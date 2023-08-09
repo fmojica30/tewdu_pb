@@ -2,6 +2,7 @@ package Collections
 
 import (
 	"errors"
+	"example/user/hello/Utils"
 	"fmt"
 	"github.com/pocketbase/dbx"
 	"github.com/pocketbase/pocketbase/core"
@@ -92,6 +93,12 @@ func increaseXP(app core.App, campaignID string) error {
 
 	record.Set("xp", newXP)
 
+	currentLevel := record.GetInt("level")
+
+	if newLevel := Utils.CalculateCurrentLevelFromXP(newXP); newLevel != currentLevel {
+		record.Set("current_level", newLevel)
+	}
+
 	if err := app.Dao().SaveRecord(record); err != nil {
 		return err
 	}
@@ -101,15 +108,19 @@ func increaseXP(app core.App, campaignID string) error {
 
 func decreaseXP(app core.App, campaignID string) error {
 	record, err := app.Dao().FindRecordById("campaign", campaignID)
-
 	if err != nil {
 		return err
 	}
 
 	currentXP := record.GetInt("xp")
-	newXP := currentXP - 1
+	currentLevel := record.GetInt("level")
 
+	newXP := currentXP - 1
 	record.Set("xp", newXP)
+
+	if newLevel := Utils.CalculateCurrentLevelFromXP(newXP); newLevel != currentLevel {
+		record.Set("current_level", newLevel)
+	}
 
 	if err := app.Dao().SaveRecord(record); err != nil {
 		return err
