@@ -79,3 +79,41 @@ func campaignValidations(app core.App, userID any) error {
 
 	return nil
 }
+
+func increaseXP(app core.App, campaignID string) error {
+	record, err := app.Dao().FindRecordById("campaign", campaignID)
+
+	if err != nil {
+		return err
+	}
+
+	currentXP := record.GetInt("xp")
+	newXP := currentXP + 1
+
+	record.Set("xp", newXP)
+
+	if err := app.Dao().SaveRecord(record); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func decreaseXP(app core.App, campaignID string) error {
+	record, err := app.Dao().FindRecordById("campaign", campaignID)
+
+	if err != nil {
+		return err
+	}
+
+	currentXP := record.GetInt("xp")
+	newXP := currentXP - 1
+
+	record.Set("xp", newXP)
+
+	if err := app.Dao().SaveRecord(record); err != nil {
+		return err
+	}
+
+	return nil
+}

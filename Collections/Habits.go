@@ -34,21 +34,40 @@ func GetDailyHabitDetails(app core.App, currentHabits []interface{}) ([]*models.
 	return records, nil
 }
 
-func ToggleHabitCompletion(app core.App, habitID string) error {
-	record, err := app.Dao().FindRecordById("habit_completion", habitID)
-
+func ToggleHabitCompletion(app core.App, habitCompletionID string) error {
+	record, err := app.Dao().FindRecordById("habit_completion", habitCompletionID)
 	if err != nil {
 		return err
 	}
 
-	completionFlag := record.Get("completion")
+	completionFlag := record.Get("complete")
+
+	habitRecord, err := app.Dao().FindRecordById("habit", record.GetString("habit"))
+	if err != nil {
+		return err
+	}
+
+	campaignRecord, err := app.Dao().FindRecordById("campaign", habitRecord.GetString("campaign"))
+	if err != nil {
+		return err
+	}
 
 	if completionFlag == true {
-		record.Set("completion", false)
+		record.Set("complete", false)
+		if err = decreaseXP(app, campaignRecord.GetId()); err != nil {
+			return err
+		}
 	} else if completionFlag == false {
-		record.Set("completion", true)
+		record.Set("complete", true)
+		if err = increaseXP(app, campaignRecord.GetId()); err != nil {
+			return err
+		}
 	} else {
 		return errors.New("message: error in toggle habit completion")
+	}
+
+	if err := app.Dao().SaveRecord(record); err != nil {
+		return err
 	}
 
 	return nil

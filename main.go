@@ -12,6 +12,7 @@ func main() {
 	Endpoints.GetDailyHabits(app)
 	Endpoints.GetActiveCampaign(app)
 	Endpoints.ToggleCampaignActiveFlag(app)
+	Endpoints.ToggleHabitCompletion(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
