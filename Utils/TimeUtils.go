@@ -13,7 +13,7 @@ func GetJuly272023Beginning() time.Time {
 // Get the end of July 27, 2023, for testing purposes
 func GetJuly272023End() time.Time {
 	today := time.Now()
-	return time.Date(2023, 07, 27, 23, 59, 59, 0, today.Location())
+	return time.Date(2023, 07, 27, 23, 59, 59, 999999999, today.Location())
 }
 
 // GetTodayBeginning
@@ -29,5 +29,5 @@ func GetTodayBeginning() time.Time {
 func GetTodayEnd() time.Time {
 	today := time.Now()
 	year, month, day := today.Date()
-	return time.Date(year, month, day, 23, 59, 59, 0, today.Location())
+	return time.Date(year, month, day, 23, 59, 59, 999999999, today.Location())
 }
