@@ -1,16 +1,18 @@
 package main
 
 import (
-	"log"
-
+	"example/user/hello/Endpoints"
 	"github.com/pocketbase/pocketbase"
+	"log"
 )
 
 func main() {
 	app := pocketbase.New()
 
-	DateStringProcess(app)
-	DailyProgress(app)
+	Endpoints.GetDailyHabitCompletion(app)
+	Endpoints.GetActiveCampaign(app)
+	Endpoints.ToggleCampaignActiveFlag(app)
+	Endpoints.ToggleHabitCompletion(app)
 
 	if err := app.Start(); err != nil {
 		log.Fatal(err)
