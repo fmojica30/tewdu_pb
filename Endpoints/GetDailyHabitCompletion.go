@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func GetDailyHabits(app core.App) {
+func GetDailyHabitCompletion(app core.App) {
 	app.OnBeforeServe().Add(func(e *core.ServeEvent) error {
 		e.Router.GET(
 			"/base/dailygoals/",

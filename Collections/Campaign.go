@@ -96,7 +96,7 @@ func increaseXP(app core.App, campaignID string) error {
 	currentLevel := record.GetInt("level")
 
 	if newLevel := Utils.CalculateCurrentLevelFromXP(newXP); newLevel != currentLevel {
-		record.Set("current_level", newLevel)
+		record.Set("level", newLevel)
 	}
 
 	if err := app.Dao().SaveRecord(record); err != nil {
@@ -119,7 +119,7 @@ func decreaseXP(app core.App, campaignID string) error {
 	record.Set("xp", newXP)
 
 	if newLevel := Utils.CalculateCurrentLevelFromXP(newXP); newLevel != currentLevel {
-		record.Set("current_level", newLevel)
+		record.Set("level", newLevel)
 	}
 
 	if err := app.Dao().SaveRecord(record); err != nil {

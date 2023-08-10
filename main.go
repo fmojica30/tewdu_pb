@@ -9,7 +9,7 @@ import (
 func main() {
 	app := pocketbase.New()
 
-	Endpoints.GetDailyHabits(app)
+	Endpoints.GetDailyHabitCompletion(app)
 	Endpoints.GetActiveCampaign(app)
 	Endpoints.ToggleCampaignActiveFlag(app)
 	Endpoints.ToggleHabitCompletion(app)
