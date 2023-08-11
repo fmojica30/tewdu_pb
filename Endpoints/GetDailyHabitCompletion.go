@@ -20,7 +20,7 @@ func GetDailyHabitCompletion(app core.App) {
 					return c.JSON(http.StatusForbidden, "Only Authenticated users can access this endpoint")
 				}
 
-				currentCampaign, err := Collections.GetActiveCampaign(app, user.GetId())
+				currentCampaign, err := Collections.GetActiveCampaign(app, user)
 				if err != nil {
 					return c.JSON(http.StatusInternalServerError, err.Error())
 				}
@@ -38,14 +38,20 @@ func GetDailyHabitCompletion(app core.App) {
 
 				currentHabitCompletion, err := Collections.GetDailyHabitDetails(app, currentHabitIds)
 
-				if err != nil {
-					return c.JSON(http.StatusInternalServerError, err.Error())
+				if len(currentHabitCompletion) == 0 {
+					err = Collections.CreateNewDailyHabits(app, currentHabits)
+					if err != nil {
+						return c.JSON(http.StatusInternalServerError, err.Error())
+					}
+					currentHabitCompletion, err = Collections.GetDailyHabitDetails(app, currentHabitIds)
+					return c.JSON(http.StatusOK, currentHabitCompletion)
+				} else {
+					return c.JSON(
+						http.StatusOK,
+						currentHabitCompletion,
+					)
 				}
 
-				return c.JSON(
-					http.StatusOK,
-					currentHabitCompletion,
-				)
 			},
 		)
 

@@ -11,10 +11,16 @@ import (
 
 // GetActiveCampaign
 // Returns the current campaign using the user
-func GetActiveCampaign(app core.App, userID string) (*models.Record, error) {
-	records, err := app.Dao().FindRecordsByExpr("campaign", dbx.And(
-		dbx.HashExp{"active": true, "user": userID},
-	))
+func GetActiveCampaign(app core.App, user *models.Record) (*models.Record, error) {
+	records, err := app.Dao().FindRecordsByExpr(
+		"campaign",
+		dbx.And(
+			dbx.HashExp{
+				"active": true,
+				"user":   user.GetId(),
+			},
+		),
+	)
 
 	if len(records) > 1 {
 		return nil, errors.New("GetActiveCampaign: Too many active campaigns")
@@ -28,8 +34,7 @@ func GetActiveCampaign(app core.App, userID string) (*models.Record, error) {
 }
 
 // GetAllCampaigns
-//
-//	Gets all campaigns
+// Gets all campaigns
 func GetAllCampaigns(app core.App, userID string) ([]*models.Record, error) {
 	records, err := app.Dao().FindRecordsByExpr("campaign", dbx.HashExp{"user": userID})
 

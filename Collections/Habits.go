@@ -23,7 +23,8 @@ func GetDailyHabitDetails(app core.App, currentHabits []interface{}) ([]*models.
 	records, err := app.Dao().FindRecordsByExpr("habit_completion",
 		dbx.And(
 			dbx.In("habit", currentHabits...),
-			dbx.Between("date", Utils.GetJuly272023Beginning(), Utils.GetJuly272023End()),
+			//dbx.Between("date", Utils.GetJuly272023Beginning(), Utils.GetJuly272023End()),
+			dbx.Between("created", Utils.GetTodayBeginning(), Utils.GetTodayEnd()),
 		),
 	)
 
@@ -68,6 +69,26 @@ func ToggleHabitCompletion(app core.App, habitCompletionID string) error {
 
 	if err := app.Dao().SaveRecord(record); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+func CreateNewDailyHabits(app core.App, currentHabits []*models.Record) error {
+	collection, err := app.Dao().FindCollectionByNameOrId("habit_completion")
+	if err != nil {
+		return err
+	}
+
+	var creationRecord *models.Record
+
+	for _, element := range currentHabits {
+		println("here")
+		creationRecord = models.NewRecord(collection)
+		creationRecord.Set("habit", element.GetId())
+		if err := app.Dao().SaveRecord(creationRecord); err != nil {
+			return err
+		}
 	}
 
 	return nil
