@@ -33,18 +33,6 @@ func GetActiveCampaign(app core.App, user *models.Record) (*models.Record, error
 	return records[0], nil
 }
 
-// GetAllCampaigns
-// Gets all campaigns
-func GetAllCampaigns(app core.App, userID string) ([]*models.Record, error) {
-	records, err := app.Dao().FindRecordsByExpr("campaign", dbx.HashExp{"user": userID})
-
-	if err != nil {
-		return nil, err
-	}
-
-	return records, err
-}
-
 // ToggleCampaignFlag
 // Changes the campaign flag to what it is not
 func ToggleCampaignFlag(app core.App, campaignID string) error {
